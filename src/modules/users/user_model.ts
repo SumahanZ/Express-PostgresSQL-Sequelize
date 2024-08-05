@@ -32,7 +32,8 @@ User.init(
       type: DataTypes.INTEGER,
     },
     userType: {
-      type: DataTypes.ENUM("user", "admin", "superadmin"),
+      type: DataTypes.ENUM,
+      values: ["user", "admin", "superadmin"],
     },
     firstName: {
       type: DataTypes.STRING,
@@ -56,7 +57,7 @@ User.init(
 
 export type UserInput = InferCreationAttributes<
   User,
-  { omit: "deletedAt" | "createdAt" | "updatedAt" }
+  { omit: "deletedAt" | "createdAt" | "updatedAt" | "id" }
 >;
 
-export default User;
+export { User };

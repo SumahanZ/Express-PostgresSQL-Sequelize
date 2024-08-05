@@ -1,9 +1,11 @@
-import { z, object, string } from "zod";
+import { z, object, string, union, literal } from "zod";
+
+z.union([z.string(), z.number()]);
 
 export const signUpUserInputSchema = object({
   body: object({
-    userType: string({
-      required_error: "Type is required",
+    userType: union([literal("user"), literal("admin"), literal("superadmin")], {
+      required_error: "User type is required",
     }),
     firstName: string({
       required_error: "First name is required",
