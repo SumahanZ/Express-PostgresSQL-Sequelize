@@ -6,7 +6,10 @@ import {
   CreationOptional,
 } from "sequelize";
 
+import bcrypt from "bcrypt";
+
 import connection from "../../config/database_config";
+import env from "../../env";
 
 class User extends Model<
   InferAttributes<User, { omit: "deletedAt" | "createdAt" | "updatedAt" }>,
@@ -43,6 +46,11 @@ User.init(
     },
     password: {
       type: DataTypes.STRING,
+      set(value: string) {
+        const salt = bcrypt.genSaltSync(env.SALT_ROUNDS);
+        const hashedPassword = bcrypt.hashSync(value, salt);
+        this.setDataValue("password", hashedPassword);
+      },
     },
     email: {
       type: DataTypes.STRING,

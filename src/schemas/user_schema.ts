@@ -16,6 +16,22 @@ export const signUpUserInputSchema = object({
     password: string({
       required_error: "Password is required",
     }).min(6, "Password too short -  should be 6 chars minimum"),
+    passwordConfirmation: string({
+      required_error: "Password confirmation is required",
+    }),
+    email: string({
+      required_error: "Email is required",
+    }).email("Not a valid email"),
+  }).refine((value) => value.password === value.passwordConfirmation, {
+    message: "Passwords do not match",
+  }),
+});
+
+export const loginUserInputSchema = object({
+  body: object({
+    password: string({
+      required_error: "Password is required",
+    }).min(6, "Password too short -  should be 6 chars minimum"),
     email: string({
       required_error: "Email is required",
     }).email("Not a valid email"),
@@ -23,3 +39,4 @@ export const signUpUserInputSchema = object({
 });
 
 export type SignUpUserInput = z.infer<typeof signUpUserInputSchema>;
+export type LoginUserInput = z.infer<typeof loginUserInputSchema>;
