@@ -10,6 +10,7 @@ import bcrypt from "bcrypt";
 
 import connection from "../../config/database_config";
 import env from "../../env";
+import { Project } from "../projects/project_model";
 
 class User extends Model<
   InferAttributes<User, { omit: "deletedAt" | "createdAt" | "updatedAt" }>,
@@ -67,5 +68,7 @@ export type UserInput = InferCreationAttributes<
   User,
   { omit: "deletedAt" | "createdAt" | "updatedAt" | "id" }
 >;
+
+User.hasMany(Project, { sourceKey: "id", as: "projects", foreignKey: "createdBy" });
 
 export { User };
