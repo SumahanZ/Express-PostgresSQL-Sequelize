@@ -87,6 +87,4 @@ export type ProjectInput = InferCreationAttributes<
   { omit: "deletedAt" | "createdAt" | "updatedAt" | "id" }
 >;
 
-Project.belongsTo(User, { targetKey: "id", as: "owner" });
-
 export { Project };

@@ -1,3 +1,6 @@
+import bcrypt from "bcrypt";
+import connection from "../../config/database_config";
+import env from "../../env";
 import {
   Model,
   DataTypes,
@@ -6,10 +9,6 @@ import {
   CreationOptional,
 } from "sequelize";
 
-import bcrypt from "bcrypt";
-
-import connection from "../../config/database_config";
-import env from "../../env";
 import { Project } from "../projects/project_model";
 
 class User extends Model<
@@ -76,5 +75,9 @@ export type UserInput = InferCreationAttributes<
 >;
 
 User.hasMany(Project, { sourceKey: "id", as: "projects", foreignKey: "createdBy" });
+
+Project.belongsTo(User, {
+  foreignKey: "createdBy",
+});
 
 export { User };

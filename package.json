@@ -29,7 +29,8 @@
     "pino": "^9.3.2",
     "pino-pretty": "^11.2.2",
     "sequelize": "^6.37.3",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "zod-validation-error": "^3.3.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
