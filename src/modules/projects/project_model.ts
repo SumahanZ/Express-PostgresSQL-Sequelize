@@ -13,12 +13,11 @@ import {
 
 class Project extends Model<
   InferAttributes<Project, { omit: "deletedAt" | "createdAt" | "updatedAt" }>,
-  InferCreationAttributes<Project, { omit: "deletedAt" | "createdAt" | "updatedAt" | "id" }>
+  InferCreationAttributes<Project, { omit: "deletedAt" | "createdAt" | "updatedAt" }>
 > {
   declare id: CreationOptional<number>;
   declare title: string;
   declare isFeatured: boolean;
-  declare productImage: string[];
   declare price: number;
   declare shortDescription: string;
   declare description: string;
@@ -46,10 +45,6 @@ Project.init(
     isFeatured: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
-      allowNull: false,
-    },
-    productImage: {
-      type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: false,
     },
     price: {
@@ -82,9 +77,14 @@ Project.init(
   }
 );
 
-export type ProjectInput = InferCreationAttributes<
+export type ProjectCreateInput = InferCreationAttributes<
   Project,
   { omit: "deletedAt" | "createdAt" | "updatedAt" | "id" }
+>;
+
+export type ProjectFetchInput = InferAttributes<
+  Project,
+  { omit: "deletedAt" | "createdAt" | "updatedAt" }
 >;
 
 export { Project };
