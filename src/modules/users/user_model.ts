@@ -38,15 +38,19 @@ User.init(
     userType: {
       type: DataTypes.ENUM,
       values: ["user", "admin", "superadmin"],
+      allowNull: false,
     },
     firstName: {
       type: DataTypes.STRING,
+      allowNull: false,
     },
     lastName: {
       type: DataTypes.STRING,
+      allowNull: false,
     },
     password: {
       type: DataTypes.STRING,
+      allowNull: false,
       set(value: string) {
         const salt = bcrypt.genSaltSync(env.SALT_ROUNDS);
         const hashedPassword = bcrypt.hashSync(value, salt);
@@ -55,6 +59,8 @@ User.init(
     },
     email: {
       type: DataTypes.STRING,
+      unique: true,
+      allowNull: false,
     },
   },
   {

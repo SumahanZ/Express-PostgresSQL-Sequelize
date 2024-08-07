@@ -12,6 +12,7 @@ const env = cleanEnv(process.env, {
   DATABASE_PASSWORD: str(),
   DATABASE_NAME: str(),
   DATABASE_HOST: str(),
+  NODE_ENV: str(),
 });
 
 export default env;
