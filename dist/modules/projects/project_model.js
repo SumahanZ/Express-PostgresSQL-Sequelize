@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Project = void 0;
 const database_config_1 = __importDefault(require("../../config/database_config"));
-const user_model_1 = require("../users/user_model");
 const sequelize_1 = require("sequelize");
 class Project extends sequelize_1.Model {
 }
@@ -26,10 +25,6 @@ Project.init({
         defaultValue: false,
         allowNull: false,
     },
-    productImage: {
-        type: sequelize_1.DataTypes.ARRAY(sequelize_1.DataTypes.STRING),
-        allowNull: false,
-    },
     price: {
         type: sequelize_1.DataTypes.DECIMAL,
         allowNull: false,
@@ -46,6 +41,14 @@ Project.init({
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
     },
+    ownerId: {
+        type: sequelize_1.DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: "users",
+            key: "id",
+        },
+    },
     category: {
         type: sequelize_1.DataTypes.ARRAY(sequelize_1.DataTypes.STRING),
     },
@@ -55,6 +58,5 @@ Project.init({
 }, {
     timestamps: true,
     sequelize: database_config_1.default,
-    modelName: "users",
+    modelName: "projects",
 });
-Project.belongsTo(user_model_1.User, { targetKey: "id", as: "owner" });

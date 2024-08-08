@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const validateRole_1 = require("../../middlewares/validateRole");
+const project_controller_1 = require("./project_controller");
+const validateSchema_1 = require("../../middlewares/validateSchema");
+const project_schema_1 = require("../../schemas/project_schema");
+const router = (0, express_1.Router)();
+router.get("/projects/:id", [(0, validateRole_1.validateRole)(["admin", "user", "superadmin"])], project_controller_1.getProjectHandler);
+router.post("/projects", [(0, validateRole_1.validateRole)(["admin", "user", "superadmin"])], project_controller_1.createProjectHandler);
+router.patch("/projects/:id", [(0, validateRole_1.validateRole)(["admin", "user", "superadmin"]), (0, validateSchema_1.validateSchema)(project_schema_1.updateProjectInputSchema)], project_controller_1.updateProjectHandler);
+router.delete("/projects/:id", [(0, validateRole_1.validateRole)(["admin", "user", "superadmin"])], project_controller_1.deleteProjectHandler);
+router.use("/api", router);
+exports.default = router;

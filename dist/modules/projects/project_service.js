@@ -12,6 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createProject = createProject;
 exports.fetchProject = fetchProject;
 exports.fetchProjects = fetchProjects;
+exports.updateProject = updateProject;
+exports.deleteProject = deleteProject;
 const project_model_1 = require("./project_model");
 const errors_1 = require("../../errors/errors");
 function createProject(input) {
@@ -20,7 +22,7 @@ function createProject(input) {
             return project_model_1.Project.create(input);
         }
         catch (err) {
-            throw new errors_1.InternalServerError("Something happened when trying to create Project");
+            throw new errors_1.InternalServerError("Something happened when trying to create project");
         }
     });
 }
@@ -30,7 +32,7 @@ function fetchProject(option) {
             return project_model_1.Project.findOne(option);
         }
         catch (err) {
-            throw new errors_1.InternalServerError("Something happened when trying to fetch Project");
+            throw new errors_1.InternalServerError("Something happened when trying to fetch the project");
         }
     });
 }
@@ -40,7 +42,27 @@ function fetchProjects(option) {
             return project_model_1.Project.findAll(option);
         }
         catch (err) {
-            throw new errors_1.InternalServerError("Something happened when trying to fetch users");
+            throw new errors_1.InternalServerError("Something happened when trying to fetch projects");
+        }
+    });
+}
+function updateProject(input, option) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return project_model_1.Project.update(input, option);
+        }
+        catch (err) {
+            throw new errors_1.InternalServerError("Something happened when trying to update project");
+        }
+    });
+}
+function deleteProject(option) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return project_model_1.Project.destroy(option);
+        }
+        catch (err) {
+            throw new errors_1.InternalServerError("Something happened when trying to delete project");
         }
     });
 }

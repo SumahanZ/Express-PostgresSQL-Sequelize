@@ -74,10 +74,11 @@ export type UserInput = InferCreationAttributes<
   { omit: "deletedAt" | "createdAt" | "updatedAt" | "id" }
 >;
 
-User.hasMany(Project, { sourceKey: "id", as: "projects", foreignKey: "createdBy" });
-
-Project.belongsTo(User, {
-  foreignKey: "createdBy",
+User.hasMany(Project, {
+  as: "projects",
+  foreignKey: "ownerId",
 });
+
+Project.belongsTo(User, { as: "owner", foreignKey: "ownerId" });
 
 export { User };

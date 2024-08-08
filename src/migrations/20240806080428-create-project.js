@@ -20,7 +20,7 @@ module.exports = {
       },
       productImage: {
         type: Sequelize.ARRAY(Sequelize.STRING),
-        allowNull: false,
+        // allowNull: false,
       },
       price: {
         type: Sequelize.DECIMAL,
@@ -44,7 +44,7 @@ module.exports = {
       tags: {
         type: Sequelize.ARRAY(Sequelize.STRING),
       },
-      createdBy: {
+      ownerId: {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {

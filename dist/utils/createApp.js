@@ -8,9 +8,11 @@ const express_1 = __importDefault(require("express"));
 const routeInitializer_1 = require("./routeInitializer");
 const globalError_1 = require("../middlewares/globalError");
 require("express-async-errors");
+const validateToken_1 = require("../middlewares/validateToken");
 function createApp() {
     const app = (0, express_1.default)();
     app.use(express_1.default.json());
+    app.use(validateToken_1.validateToken);
     (0, routeInitializer_1.initializeRoute)(app);
     app.use(globalError_1.errorHandler);
     return app;

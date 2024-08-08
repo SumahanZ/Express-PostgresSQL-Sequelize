@@ -32,7 +32,7 @@ export const createProjectInputSchema = object({
 
 export const updateProjectInputSchema = object({
   params: object({
-    id: number({
+    id: string({
       required_error: "Project id is required",
     }),
   }),

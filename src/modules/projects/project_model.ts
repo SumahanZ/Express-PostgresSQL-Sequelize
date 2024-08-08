@@ -64,6 +64,14 @@ Project.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    ownerId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "users",
+        key: "id",
+      },
+    },
     category: {
       type: DataTypes.ARRAY(DataTypes.STRING),
     },
@@ -74,7 +82,7 @@ Project.init(
   {
     timestamps: true,
     sequelize: connection,
-    modelName: "users",
+    modelName: "projects",
   }
 );
 

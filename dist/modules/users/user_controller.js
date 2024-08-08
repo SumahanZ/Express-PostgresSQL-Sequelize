@@ -37,36 +37,65 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.signUpHandler = signUpHandler;
 exports.loginHandler = loginHandler;
+exports.getAllProjectByUserIdHandler = getAllProjectByUserIdHandler;
 const UserService = __importStar(require("./user_service"));
+const ProjectService = __importStar(require("../projects/project_service"));
 const lodash_1 = require("lodash");
 const jwtUtils_1 = require("../../utils/jwtUtils");
 const env_1 = __importDefault(require("../../env"));
 const errors_1 = require("../../errors/errors");
-function signUpHandler(req, res) {
+function signUpHandler(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        const newUser = yield UserService.createUser(req.body);
-        if (!newUser)
-            throw new errors_1.BadRequestError("User failed to be created");
-        const user = (0, lodash_1.omit)(newUser, ["password"]);
-        return res.status(201).json(user);
+        try {
+            const newUser = yield UserService.createUser(req.body);
+            if (!newUser)
+                throw new errors_1.BadRequestError("User failed to be created");
+            const user = (0, lodash_1.omit)(newUser, ["password"]);
+            return res.status(201).json(user.dataValues);
+        }
+        catch (err) {
+            return next(err);
+        }
     });
 }
-function loginHandler(req, res) {
+function loginHandler(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { email, password } = req.body;
-        const validatedUser = yield UserService.validatePassword(email, password);
-        if (!validatedUser)
-            throw new errors_1.BadRequestError("Email or password is not valid");
-        const accessToken = (0, jwtUtils_1.signJWT)(validatedUser, {
-            expiresIn: env_1.default.ACCESS_TOKEN_LIFE,
-        });
-        if (!accessToken)
-            throw new errors_1.BadRequestError("Failed to generate access token");
-        const refreshToken = (0, jwtUtils_1.signJWT)(validatedUser, {
-            expiresIn: env_1.default.REFRESH_TOKEN_LIFE,
-        });
-        if (!refreshToken)
-            throw new errors_1.BadRequestError("Failed to generate refresh token!");
-        return res.status(200).json({ accessToken, refreshToken, user: validatedUser });
+        try {
+            const { email, password } = req.body;
+            const validatedUser = yield UserService.validatePassword(email, password);
+            if (!validatedUser)
+                throw new errors_1.BadRequestError("Email or password is not valid");
+            const accessToken = (0, jwtUtils_1.signJWT)(validatedUser, {
+                expiresIn: env_1.default.ACCESS_TOKEN_LIFE,
+            });
+            if (!accessToken)
+                throw new errors_1.BadRequestError("Failed to generate access token");
+            const refreshToken = (0, jwtUtils_1.signJWT)(validatedUser, {
+                expiresIn: env_1.default.REFRESH_TOKEN_LIFE,
+            });
+            if (!refreshToken)
+                throw new errors_1.BadRequestError("Failed to generate refresh token!");
+            return res.status(200).json({ accessToken, refreshToken, user: validatedUser.dataValues });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+}
+function getAllProjectByUserIdHandler(req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const projects = yield ProjectService.fetchProjects({
+                where: {
+                    ownerId: req.params.userId,
+                },
+            });
+            if (!projects)
+                throw new errors_1.BadRequestError("No projects were fetched");
+            return res.status(201).send(projects);
+        }
+        catch (err) {
+            return next(err);
+        }
     });
 }

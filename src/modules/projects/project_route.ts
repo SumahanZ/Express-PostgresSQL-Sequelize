@@ -2,30 +2,30 @@ import { Router } from "express";
 import { validateRole } from "../../middlewares/validateRole";
 import {
   createProjectHandler,
-  getAllProjectHandler,
+  deleteProjectHandler,
   getProjectHandler,
+  updateProjectHandler,
 } from "./project_controller";
-import { validateToken } from "../../middlewares/validateToken";
+import { validateSchema } from "../../middlewares/validateSchema";
+import { updateProjectInputSchema } from "../../schemas/project_schema";
 
 const router = Router();
 
-router.get(
+router.get("/projects/:id", [validateRole(["admin", "user", "superadmin"])], getProjectHandler);
+
+router.post("/projects", [validateRole(["admin", "user", "superadmin"])], createProjectHandler);
+
+router.patch(
   "/projects/:id",
-  [validateToken, validateRole(["admin", "user", "superadmin"])],
-  getProjectHandler
+  [validateRole(["admin", "user", "superadmin"]), validateSchema(updateProjectInputSchema)],
+  updateProjectHandler
 );
-router.get(
-  "/projects/:userId",
-  [validateToken, validateRole(["admin", "user", "superadmin"])],
-  getAllProjectHandler
+
+router.delete(
+  "/projects/:id",
+  [validateRole(["admin", "user", "superadmin"])],
+  deleteProjectHandler
 );
-router.post(
-  "/projects",
-  [validateToken, validateRole(["admin", "user", "superadmin"])],
-  createProjectHandler
-);
-router.put("/projects:id", [validateToken, validateRole(["admin", "user", "superadmin"])]);
-router.delete("/projects/:id", [validateToken, validateRole(["admin", "user", "superadmin"])]);
 
 router.use("/api", router);
 
