@@ -26,9 +26,12 @@ export async function fetchProjects(option?: FindOptions<ProjectFetchInput>) {
   }
 }
 
-export async function updateProject(option?: UpdateOptions<ProjectFetchInput>) {
+export async function updateProject(
+  input: Partial<ProjectCreateInput>,
+  option: UpdateOptions<ProjectFetchInput>
+) {
   try {
-    return Project.findAll(option);
+    return Project.update(input, option);
   } catch (err: any) {
     throw new InternalServerError("Something happened when trying to update project");
   }

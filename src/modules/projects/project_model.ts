@@ -23,6 +23,7 @@ class Project extends Model<
   declare description: string;
   declare productUrl: string;
   declare category: string[];
+  declare ownerId: ForeignKey<User["id"]>;
   declare tags: string[];
   declare owner?: NonAttribute<User>;
   declare createdAt: CreationOptional<Date>;
