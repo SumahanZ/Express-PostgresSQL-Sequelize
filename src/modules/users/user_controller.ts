@@ -6,6 +6,7 @@ import { omit } from "lodash";
 import { signJWT } from "../../utils/jwtUtils";
 import env from "../../env";
 import { BadRequestError } from "../../errors/errors";
+import { User } from "./user_model";
 
 export async function signUpHandler(
   req: Request<{}, {}, SignUpUserInput["body"], {}>,
@@ -15,8 +16,7 @@ export async function signUpHandler(
   try {
     const newUser = await UserService.createUser(req.body);
     if (!newUser) throw new BadRequestError("User failed to be created");
-    const user = omit(newUser, ["password"]);
-    return res.status(201).json(user.dataValues);
+    return res.status(201).json(newUser);
   } catch (err: any) {
     return next(err);
   }
@@ -34,15 +34,11 @@ export async function loginHandler(
 
     if (!validatedUser) throw new BadRequestError("Email or password is not valid");
 
-    const accessToken = signJWT(validatedUser, {
-      expiresIn: env.ACCESS_TOKEN_LIFE,
-    });
+    const accessToken = await UserService.generateAccessToken(validatedUser);
 
     if (!accessToken) throw new BadRequestError("Failed to generate access token");
 
-    const refreshToken = signJWT(validatedUser, {
-      expiresIn: env.REFRESH_TOKEN_LIFE,
-    });
+    const refreshToken = await UserService.generateRefreshToken(validatedUser);
 
     if (!refreshToken) throw new BadRequestError("Failed to generate refresh token!");
 
