@@ -1,6 +1,7 @@
 import { DestroyOptions, FindOptions, UpdateOptions } from "sequelize";
 import { Project, ProjectCreateInput, ProjectFetchInput } from "./project_model";
-import { InternalServerError } from "../../errors/errors";
+import { BadRequestError, InternalServerError } from "../../errors/errors";
+import { User } from "../users/user_model";
 
 export async function createProject(input: ProjectCreateInput) {
   try {
@@ -43,4 +44,14 @@ export async function deleteProject(option?: DestroyOptions<ProjectFetchInput>) 
   } catch (err: any) {
     throw new InternalServerError("Something happened when trying to delete project");
   }
+}
+
+export async function checkProjectOwner(localsUsers: User, selectedProject: Project | null) {
+  if (
+    selectedProject?.dataValues &&
+    selectedProject.dataValues.ownerId !== localsUsers.dataValues.id
+  )
+    return false;
+
+  return true;
 }

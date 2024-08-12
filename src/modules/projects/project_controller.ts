@@ -3,6 +3,7 @@ import { CreateProjectInput, UpdateProjectInput } from "../../schemas/project_sc
 import * as ProjectService from "./project_service";
 import { BadRequestError, NotFoundError } from "../../errors/errors";
 import { User } from "../users/user_model";
+import { Project } from "./project_model";
 
 export async function createProjectHandler(
   req: Request<{}, {}, CreateProjectInput["body"]>,
@@ -51,13 +52,11 @@ export async function updateProjectHandler(
       },
     });
 
-    if (
-      selectedProject?.dataValues &&
-      selectedProject.dataValues.ownerId !== res.locals.user.dataValues.id
-    )
+    if (!(await ProjectService.checkProjectOwner(res.locals.user, selectedProject)))
       throw new BadRequestError("The current user isn't the owner of the project");
 
     if (!req.body) throw new BadRequestError("No request body was passed");
+
     const updatedProject: number[] = await ProjectService.updateProject(req.body, {
       where: {
         id: req.params.id,
@@ -85,12 +84,8 @@ export async function deleteProjectHandler(
       },
     });
 
-    if (
-      selectedProject?.dataValues &&
-      selectedProject.dataValues.ownerId !== res.locals.user.dataValues.id
-    ) {
+    if (!(await ProjectService.checkProjectOwner(res.locals.user, selectedProject)))
       throw new BadRequestError("The current user isn't the owner of the project");
-    }
 
     const deletedProject = await ProjectService.deleteProject({
       where: {
