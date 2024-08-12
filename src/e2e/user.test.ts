@@ -1,15 +1,12 @@
 import { createApp } from "../utils/createApp";
-import dotenv from "dotenv";
 import { Sequelize } from "sequelize";
+import dbConnection from "../config/database_config";
 import supertest from "supertest";
 import env from "../env";
 import * as UserService from "../modules/users/user_service";
 import { InternalServerError } from "../errors/errors";
-import log from "../utils/logger";
 
 const app = createApp();
-
-let connection: unknown;
 
 describe("User Module", () => {
   const createUserInput = {
@@ -49,20 +46,17 @@ describe("User Module", () => {
   };
 
   beforeAll(() => {
-    connection = new Sequelize(
-      env.DATABASE_NAME_TEST,
-      env.DATABASE_USERNAME_TEST,
-      env.DATABASE_PASSWORD_TEST,
-      {
-        host: env.DATABASE_HOST_TEST,
-        dialect: "postgres",
-      }
-    );
+    dbConnection.connect({
+      name: env.DATABASE_NAME_TEST,
+      username: env.DATABASE_USERNAME_TEST,
+      password: env.DATABASE_PASSWORD_TEST,
+      host: env.DATABASE_HOST_TEST,
+    });
 
-    if (!(connection instanceof Sequelize))
+    if (!(dbConnection.connection instanceof Sequelize))
       fail("Connection is not an instance of Sequelize class");
 
-    connection
+    dbConnection.connection
       .authenticate()
       .then(() => {
         console.log("Connected to Test DB");
@@ -72,20 +66,21 @@ describe("User Module", () => {
       });
   });
 
-  beforeEach(() => {
-    //delete user table
-    if (connection instanceof Sequelize) {
-      //drop tables in users
-      connection.query("DELETE FROM users; DELETE FROM projects;");
+  beforeEach(async () => {
+    if (dbConnection.connection instanceof Sequelize) {
+      //drop tables
+      await dbConnection.connection.query("DELETE FROM projects;");
+      await dbConnection.connection.query("DELETE FROM users;");
     }
   });
 
   afterAll(async () => {
-    //close sequelize connection
-    if (!(connection instanceof Sequelize))
+    if (!(dbConnection.connection instanceof Sequelize))
       fail("Connection is not an instance of Sequelize class");
-    await connection.drop();
-    await connection.close();
+    await dbConnection.connection.query("DELETE FROM projects;");
+    await dbConnection.connection.query("DELETE FROM users;");
+    // await dbConnection.drop();
+    await dbConnection.close();
   });
 
   describe("User Signup Feature", () => {
@@ -154,7 +149,7 @@ describe("User Module", () => {
     });
 
     describe("Given that email or password input field are not valid", () => {
-      it("should return a response with status code of 400 (bad request error) and error message", async () => {
+      it("should return a response with status code of 404 (Not found error) and error message", async () => {
         const validateUserServiceMock = jest
           .spyOn(UserService, "validatePassword")
           //@ts-ignore
@@ -162,7 +157,7 @@ describe("User Module", () => {
 
         const { statusCode } = await supertest(app).post("/api/login").send(loginUserInput);
 
-        expect(statusCode).toBe(400);
+        expect(statusCode).toBe(404);
         expect(validateUserServiceMock).toHaveBeenCalledTimes(1);
       });
     });

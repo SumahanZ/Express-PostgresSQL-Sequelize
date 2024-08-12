@@ -1,5 +1,4 @@
 import bcrypt from "bcrypt";
-import connection from "../../config/database_config";
 import env from "../../env";
 import {
   Model,
@@ -7,9 +6,8 @@ import {
   InferAttributes,
   InferCreationAttributes,
   CreationOptional,
+  Sequelize,
 } from "sequelize";
-
-import { Project } from "../projects/project_model";
 
 class User extends Model<
   InferAttributes<User, { omit: "deletedAt" | "createdAt" | "updatedAt" }>,
@@ -26,59 +24,54 @@ class User extends Model<
   declare deletedAt: CreationOptional<Date> | null;
 }
 
-User.init(
-  {
-    id: {
-      allowNull: false,
-      autoIncrement: true,
-      primaryKey: true,
-      type: DataTypes.INTEGER,
-    },
-    userType: {
-      type: DataTypes.ENUM,
-      values: ["user", "admin", "superadmin"],
-      allowNull: false,
-    },
-    firstName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    lastName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      set(value: string) {
-        const salt = bcrypt.genSaltSync(env.SALT_ROUNDS);
-        const hashedPassword = bcrypt.hashSync(value, salt);
-        this.setDataValue("password", hashedPassword);
+export function initializeUserModel(sequelize: Sequelize) {
+  return User.init(
+    {
+      id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: DataTypes.INTEGER,
+      },
+      userType: {
+        type: DataTypes.ENUM,
+        values: ["user", "admin", "superadmin"],
+        allowNull: false,
+      },
+      firstName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      lastName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        set(value: string) {
+          const salt = bcrypt.genSaltSync(env.SALT_ROUNDS);
+          const hashedPassword = bcrypt.hashSync(value, salt);
+          this.setDataValue("password", hashedPassword);
+        },
+      },
+      email: {
+        type: DataTypes.STRING,
+        unique: true,
+        allowNull: false,
       },
     },
-    email: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: false,
-    },
-  },
-  {
-    timestamps: true,
-    sequelize: connection,
-    modelName: "users",
-  }
-);
+    {
+      timestamps: true,
+      sequelize: sequelize,
+      modelName: "users",
+    }
+  );
+}
 
 export type UserInput = InferCreationAttributes<
   User,
   { omit: "deletedAt" | "createdAt" | "updatedAt" | "id" }
 >;
-
-User.hasMany(Project, {
-  as: "projects",
-  foreignKey: "ownerId",
-});
-
-Project.belongsTo(User, { as: "owner", foreignKey: "ownerId" });
 
 export { User };

@@ -1,4 +1,3 @@
-import connection from "../../config/database_config";
 import { User } from "../users/user_model";
 
 import {
@@ -9,6 +8,7 @@ import {
   CreationOptional,
   ForeignKey,
   NonAttribute,
+  Sequelize,
 } from "sequelize";
 
 class Project extends Model<
@@ -31,60 +31,62 @@ class Project extends Model<
   declare deletedAt: CreationOptional<Date> | null;
 }
 
-Project.init(
-  {
-    id: {
-      allowNull: false,
-      autoIncrement: true,
-      primaryKey: true,
-      type: DataTypes.INTEGER,
-    },
-    title: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    isFeatured: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-      allowNull: false,
-    },
-    price: {
-      type: DataTypes.DECIMAL,
-      allowNull: false,
-    },
-    shortDescription: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
-    description: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
-    productUrl: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    ownerId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: "users",
-        key: "id",
+export function initializeProjectModel(sequelize: Sequelize) {
+  return Project.init(
+    {
+      id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: DataTypes.INTEGER,
+      },
+      title: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      isFeatured: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
+      price: {
+        type: DataTypes.DECIMAL,
+        allowNull: false,
+      },
+      shortDescription: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+      description: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+      productUrl: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      ownerId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "users",
+          key: "id",
+        },
+      },
+      category: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+      },
+      tags: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
       },
     },
-    category: {
-      type: DataTypes.ARRAY(DataTypes.STRING),
-    },
-    tags: {
-      type: DataTypes.ARRAY(DataTypes.STRING),
-    },
-  },
-  {
-    timestamps: true,
-    sequelize: connection,
-    modelName: "projects",
-  }
-);
+    {
+      timestamps: true,
+      sequelize: sequelize,
+      modelName: "projects",
+    }
+  );
+}
 
 export type ProjectCreateInput = InferCreationAttributes<
   Project,

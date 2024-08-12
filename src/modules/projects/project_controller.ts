@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { CreateProjectInput, UpdateProjectInput } from "../../schemas/project_schema";
 import * as ProjectService from "./project_service";
-import { BadRequestError } from "../../errors/errors";
+import { BadRequestError, NotFoundError } from "../../errors/errors";
 import { User } from "../users/user_model";
 
 export async function createProjectHandler(
@@ -15,7 +15,7 @@ export async function createProjectHandler(
       ownerId: parseInt(req.body.ownerId),
     });
 
-    if (!createdProject) throw new BadRequestError("Project failed to be created");
+    if (!createdProject) throw new NotFoundError("Project failed to be created");
 
     return res.status(201).send(createdProject);
   } catch (err: any) {
@@ -31,9 +31,9 @@ export async function getProjectHandler(req: Request, res: Response, next: NextF
       },
     });
 
-    if (!project) throw new BadRequestError("No project fetched");
+    if (!project) throw new NotFoundError("No project fetched");
 
-    return res.status(201).send(project);
+    return res.status(200).send(project);
   } catch (err: any) {
     return next(err);
   }
@@ -65,7 +65,7 @@ export async function updateProjectHandler(
       returning: true,
     });
 
-    if (!updatedProject) throw new BadRequestError("No project updated");
+    if (!updatedProject) throw new NotFoundError("No project updated");
 
     return res.status(201).send(updatedProject[1]);
   } catch (err: any) {

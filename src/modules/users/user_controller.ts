@@ -2,11 +2,7 @@ import * as UserService from "./user_service";
 import { NextFunction, Request, Response } from "express";
 import * as ProjectService from "../projects/project_service";
 import { LoginUserInput, SignUpUserInput } from "../../schemas/user_schema";
-import { omit } from "lodash";
-import { signJWT } from "../../utils/jwtUtils";
-import env from "../../env";
-import { BadRequestError } from "../../errors/errors";
-import { User } from "./user_model";
+import { BadRequestError, NotFoundError } from "../../errors/errors";
 
 export async function signUpHandler(
   req: Request<{}, {}, SignUpUserInput["body"], {}>,
@@ -15,7 +11,7 @@ export async function signUpHandler(
 ) {
   try {
     const newUser = await UserService.createUser(req.body);
-    if (!newUser) throw new BadRequestError("User failed to be created");
+    if (!newUser) throw new NotFoundError("User failed to be created");
     return res.status(201).json(newUser);
   } catch (err: any) {
     return next(err);
@@ -32,7 +28,7 @@ export async function loginHandler(
 
     const validatedUser = await UserService.validatePassword(email, password);
 
-    if (!validatedUser) throw new BadRequestError("Email or password is not valid");
+    if (!validatedUser) throw new NotFoundError("Email or password is not valid");
 
     const accessToken = await UserService.generateAccessToken(validatedUser);
 
@@ -60,9 +56,9 @@ export async function getAllProjectByUserIdHandler(
       },
     });
 
-    if (!projects) throw new BadRequestError("No projects were fetched");
+    if (!projects) throw new NotFoundError("No projects were fetched");
 
-    return res.status(201).send(projects);
+    return res.status(200).send(projects);
   } catch (err: any) {
     return next(err);
   }
